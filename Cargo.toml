@@ -1,0 +1,21 @@
+[package]
+name = "hexviewer"
+version = "0.1.0"
+edition = "2021"
+authors = ["Lei"]
+description = "A hex viewer application"
+
+[package.metadata.packager]
+before-packaging-command = "cargo build --release"
+name = "HexViewer"
+identifier = "com.lei.hexviewer"
+authors = ["lei"]
+description = "A hex viewer application that allows you to view and edit hex values."
+
+[dependencies]
+eframe = "0.27.1"
+egui_extras = { version = "0.27.1", features = ["image"] }
+env_logger = { version = "0.10", default-features = false, features = [
+    "auto-color",
+    "humantime",
+]}
