@@ -78,22 +78,42 @@ impl HexViewer {
                 self.input = self.format_input_for_base(self.value);
             }
 
-            let resp = ui.text_edit_singleline(&mut self.input);
-            if resp.changed() {
-                let parsed = match self.base {
-                    InputBase::Hex => parse_hex_to_u64(&self.input),
-                    InputBase::Dec => parse_dec_to_u64(&self.input),
-                };
-                if let Some(v) = parsed {
-                    self.value = v;
-                    self.input = self.format_input_for_base(self.value);
+            ui.scope(|ui| {
+                ui.visuals_mut().widgets.inactive.bg_stroke = egui::Stroke::new(1.0, egui::Color32::BLACK);
+                ui.visuals_mut().widgets.inactive.rounding = egui::Rounding::same(4.0);
+                ui.visuals_mut().widgets.hovered.bg_stroke = egui::Stroke::new(1.0, egui::Color32::BLACK);
+                ui.visuals_mut().widgets.hovered.rounding = egui::Rounding::same(4.0);
+                ui.visuals_mut().widgets.active.bg_stroke = egui::Stroke::new(1.0, egui::Color32::BLACK);
+                ui.visuals_mut().widgets.active.rounding = egui::Rounding::same(4.0);
+
+                let resp = ui.text_edit_singleline(&mut self.input);
+                if resp.changed() {
+                    let parsed = match self.base {
+                        InputBase::Hex => parse_hex_to_u64(&self.input),
+                        InputBase::Dec => parse_dec_to_u64(&self.input),
+                    };
+                    if let Some(v) = parsed {
+                        self.value = v;
+                        self.input = self.format_input_for_base(self.value);
+                    }
                 }
+            });
+
+            if ui.button("<<").on_hover_text("Left Shift (<< 1)").clicked() {
+                self.value = self.value.wrapping_shl(1);
+                self.input = self.format_input_for_base(self.value);
+            }
+
+            if ui.button(">>").on_hover_text("Right Shift (>> 1)").clicked() {
+                self.value = self.value.wrapping_shr(1);
+                self.input = self.format_input_for_base(self.value);
             }
 
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                ui.add_space(5.0);
                 let pin_text = egui::RichText::new("📌").size(18.0);
                 let mut button =
-                    egui::Button::new(pin_text).min_size(egui::vec2(28.0, 28.0));
+                    egui::Button::new(pin_text).min_size(egui::vec2(22.0, 22.0));
                 if self.is_always_on_top {
                     button = button.fill(egui::Color32::from_rgb(0, 122, 255));
                 }
